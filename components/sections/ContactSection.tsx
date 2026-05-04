@@ -146,7 +146,7 @@ export default function ContactSection() {
                   <h3 className="font-display text-2xl text-text-primary" style={{ fontFamily: 'var(--font-display)' }}>
                     Message Sent
                   </h3>
-                  <p className="text-text-muted text-sm">Thank you for reaching out. I'll respond within 24 hours.</p>
+                  <p className="text-text-muted text-sm">Thank you for reaching out. I&apos;ll respond within 24 hours.</p>
                   <button
                     onClick={() => setStatus('idle')}
                     className="btn-outline-gold mt-4"

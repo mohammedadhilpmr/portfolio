@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 
 export default function CustomCursor() {
-  const cursorRef = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState(false)
   const [clicked, setClicked] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -13,15 +12,12 @@ export default function CustomCursor() {
   const mouseX = useMotionValue(-100)
   const mouseY = useMotionValue(-100)
 
-  // Main dot — snappy
   const dotX = useSpring(mouseX, { stiffness: 1000, damping: 50, mass: 0.1 })
   const dotY = useSpring(mouseY, { stiffness: 1000, damping: 50, mass: 0.1 })
 
-  // Ring — laggy/trailing
   const ringX = useSpring(mouseX, { stiffness: 120, damping: 18, mass: 0.5 })
   const ringY = useSpring(mouseY, { stiffness: 120, damping: 18, mass: 0.5 })
 
-  // Outer aura — very laggy
   const auraX = useSpring(mouseX, { stiffness: 60, damping: 14, mass: 0.8 })
   const auraY = useSpring(mouseY, { stiffness: 60, damping: 14, mass: 0.8 })
 
@@ -30,21 +26,16 @@ export default function CustomCursor() {
       mouseX.set(e.clientX)
       mouseY.set(e.clientY)
     }
-
     const onLeave = () => setHidden(true)
     const onEnter = () => setHidden(false)
-
     const onDown = () => setClicked(true)
     const onUp = () => setClicked(false)
-
-    // Detect hoverable elements
     const onHoverStart = (e: MouseEvent) => {
       const target = e.target as HTMLElement
       const interactive = target.closest('a, button, [data-cursor], input, textarea, select, label')
       if (interactive) {
         setHovered(true)
-        const cursorLabel = (interactive as HTMLElement).dataset?.cursor || ''
-        setLabel(cursorLabel)
+        setLabel((interactive as HTMLElement).dataset?.cursor || '')
       } else {
         setHovered(false)
         setLabel('')
@@ -57,7 +48,6 @@ export default function CustomCursor() {
     window.addEventListener('mouseenter', onEnter)
     window.addEventListener('mousedown', onDown)
     window.addEventListener('mouseup', onUp)
-
     return () => {
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mousemove', onHoverStart)
@@ -72,14 +62,6 @@ export default function CustomCursor() {
     <>
       {/* Outer aura glow */}
       <motion.div
-        style={{ x: auraX, y: auraY, translateX: '-50%', translateY: '-50%' }}
-        animate={{
-          opacity: hidden ? 0 : hovered ? 0.15 : 0.06,
-          scale: clicked ? 0.7 : hovered ? 2.2 : 1,
-          width: hovered ? 80 : 56,
-          height: hovered ? 80 : 56,
-        }}
-        transition={{ duration: 0.4 }}
         className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full"
         style={{
           x: auraX,
@@ -91,20 +73,15 @@ export default function CustomCursor() {
           width: 56,
           height: 56,
         }}
+        animate={{
+          opacity: hidden ? 0 : hovered ? 0.15 : 0.06,
+          scale: clicked ? 0.7 : hovered ? 2.2 : 1,
+        }}
+        transition={{ duration: 0.4 }}
       />
 
       {/* Ring */}
       <motion.div
-        style={{ x: ringX, y: ringY, translateX: '-50%', translateY: '-50%' }}
-        animate={{
-          opacity: hidden ? 0 : 1,
-          scale: clicked ? 0.6 : hovered ? 1.6 : 1,
-          borderColor: hovered ? 'rgba(201,168,76,0.9)' : 'rgba(201,168,76,0.5)',
-          width: hovered ? 44 : 32,
-          height: hovered ? 44 : 32,
-          borderWidth: hovered ? 1.5 : 1,
-        }}
-        transition={{ duration: 0.25 }}
         className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full border"
         style={{
           x: ringX,
@@ -115,8 +92,13 @@ export default function CustomCursor() {
           height: 32,
           border: '1px solid rgba(201,168,76,0.5)',
         }}
+        animate={{
+          opacity: hidden ? 0 : 1,
+          scale: clicked ? 0.6 : hovered ? 1.6 : 1,
+          borderColor: hovered ? 'rgba(201,168,76,0.9)' : 'rgba(201,168,76,0.5)',
+        }}
+        transition={{ duration: 0.25 }}
       >
-        {/* Label inside ring when hovering */}
         {label && (
           <motion.span
             initial={{ opacity: 0, scale: 0.5 }}
@@ -130,13 +112,6 @@ export default function CustomCursor() {
 
       {/* Center dot */}
       <motion.div
-        style={{ x: dotX, y: dotY, translateX: '-50%', translateY: '-50%' }}
-        animate={{
-          opacity: hidden ? 0 : 1,
-          scale: clicked ? 2 : hovered ? 0 : 1,
-          backgroundColor: hovered ? '#e8c97a' : '#c9a84c',
-        }}
-        transition={{ duration: 0.15 }}
         className="fixed top-0 left-0 pointer-events-none z-[10000] rounded-full"
         style={{
           x: dotX,
@@ -148,6 +123,11 @@ export default function CustomCursor() {
           backgroundColor: '#c9a84c',
           boxShadow: '0 0 6px 2px rgba(201,168,76,0.6)',
         }}
+        animate={{
+          opacity: hidden ? 0 : 1,
+          scale: clicked ? 2 : hovered ? 0 : 1,
+        }}
+        transition={{ duration: 0.15 }}
       />
     </>
   )
